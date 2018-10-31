@@ -2,6 +2,9 @@
 	"name": "spotifyapi",
 	"version": "0.0.1",
 	"main": "app.js",
+	"scripts": {
+		"start": "node app.js"
+	},
 	"author": "Peter Jones",
 	"repository": "https://pdjones@bitbucket.org/pdjones/visualisation.git"
 }
