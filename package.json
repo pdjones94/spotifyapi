@@ -1,10 +1,30 @@
 {
-	"name": "spotifyapi",
-	"version": "0.0.1",
-	"main": "app.js",
-	"scripts": {
-		"start": "node app.js"
-	},
-	"author": "Peter Jones",
-	"repository": "https://pdjones@bitbucket.org/pdjones/visualisation.git"
+  "name": "spotifyapi",
+  "version": "0.0.1",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Peter Jones",
+  "repository": {
+    "type": "git",
+    "url": "git+https://pdjones@bitbucket.org/pdjones/visualisation.git"
+  },
+  "description": "A play around with the spotify API expanding from the Athorization Code example at https://github.com/spotify/web-api-auth-examples",
+  "homepage": "https://bitbucket.org/pdjones/visualisation#readme",
+  "dependencies": {
+    "c3": "^0.4.21",
+    "cookie-parser": "^1.4.3",
+    "d3": "^3.5.17",
+    "express": "^4.16.2",
+    "gulp": "^3.9.1",
+    "gulp-changed": "^3.2.0",
+    "gulp-jscs": "^4.1.0",
+    "gulp-uglify": "^3.0.0",
+    "gulp-watch": "^5.0.0",
+    "merge-stream": "^1.0.1",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {},
+  "license": "ISC"
 }
