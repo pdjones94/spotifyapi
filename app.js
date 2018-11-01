@@ -1,25 +1,25 @@
-var express = require('express');
-var request = require('request');
-var querystring = require('querystring');
-var cookieParser = require('cookie-parser');
+const express = require('express');
+const request = require('request');
+const querystring = require('querystring');
+const cookieParser = require('cookie-parser');
 
-var client_id = '05cde070c8c3420c9d807de08de16b63';
-var client_secret = '1c5da778d14b49b4bfa400f0d72931c7';
+const client_id = '05cde070c8c3420c9d807de08de16b63';
+const client_secret = '1c5da778d14b49b4bfa400f0d72931c7';
 
-var redirect_uri = process.env.PORT ? 'http://localhost:'+process.env.PORT+'/callback' : 'http://localhost:8888/callback';
-
-console.log(redirect_uri);
+// console.log(redirect_uri);
 
 var song_analysis;
-
 const PORT = process.env.PORT || 8888;
+
+const redirect_uri = PORT<=9999 ? 'http://localhost:'+PORT+'/callback' : 'https://wicked-moonlight-95928.herokuapp.com/callback';
+
 
 /**
  * Generates a random string containing numbers and letters
  * @param {number} length
  * @return {srting} The generated string
  */
-var generateRandomString = function(length) {
+generateRandomString = (length) => {
  	var text = '';
  	var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
