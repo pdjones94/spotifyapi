@@ -5,11 +5,14 @@ var cookieParser = require('cookie-parser');
 
 var client_id = '05cde070c8c3420c9d807de08de16b63';
 var client_secret = '1c5da778d14b49b4bfa400f0d72931c7';
-var redirect_uri = 'http://localhost:8888/callback';
+
+var redirect_uri = process.env.PORT ? 'http://localhost:'+process.env.PORT+'/callback' : 'http://localhost:8888/callback';
+
+console.log(redirect_uri);
 
 var song_analysis;
 
-const PORT = 8888;
+const PORT = process.env.PORT || 8888;
 
 /**
  * Generates a random string containing numbers and letters
