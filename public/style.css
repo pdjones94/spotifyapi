@@ -2,6 +2,10 @@
   display: none;
 }
 
+.container {
+  background-color: #dbd7ba;
+}
+
 .text-overflow {
   overflow: hidden;
   text-overflow: ellipsis;

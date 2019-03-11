@@ -181,13 +181,17 @@ function getTrackAnalysis(id) {
 * Send POST request to 
 */
 function postTrackAnalysis(response, id) {
+  console.log(response);
   $.ajax({
     method: 'POST',
     url: '/rec-analysis',
-    data: {
-      analysis: JSON.stringify(response),
-      id: encodeURIComponent(id)
-    },
+    dataType: 'json',
+    // data: {
+    //   analysis: JSON.stringify(response),
+    //   id: encodeURIComponent(id)
+    // },
+    // processData: false,
+    data: JSON.stringify(response),
     contentType: 'application/json',
     success: function(response) {
       console.log(response);
@@ -240,10 +244,13 @@ function updateChart() {
   }
   else {
     first_track = false;
-  }
-
-  
+  }  
 }
+
+function seekToPoint(e) {
+
+}
+
 
 var userProfileSource = document.getElementById('user-profile-template').innerHTML,
     userProfileTemplate = Handlebars.compile(userProfileSource),

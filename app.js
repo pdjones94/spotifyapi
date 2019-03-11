@@ -34,7 +34,8 @@ var stateKey = 'spotify_auth_state';
 var app = express();
 
 app.use(express.static(__dirname + '/public'))
-	.use(cookieParser());
+	.use(cookieParser())
+	.use(express.json({limit: '50mb'}));
 
 app.get('/login', (req, res, next) => {
 
@@ -143,11 +144,12 @@ app.get('/refresh_token', (req, res, next) => {
 
 app.post('/rec-analysis', (req, res, next) => {
 	var error = false;
+	console.log(req.body);
 	req.on('data', (data) => {
 		// song_analysis = JSON.parse(data.analysis);
 		// console.log('Data: '+data.analysis);
 		try {
-			console.log(decodeURIComponent(data));
+			analysis = data;
 		} catch(e) {
 			console.log(e);
 			error = true;
