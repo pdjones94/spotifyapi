@@ -9,6 +9,7 @@ const client_secret = '1c5da778d14b49b4bfa400f0d72931c7';
 // console.log(redirect_uri);
 
 var song_analysis;
+var song_features = [];
 const PORT = process.env.PORT || 8888;
 
 const redirect_uri = PORT<=9999 ? 'http://localhost:'+PORT+'/callback' : 'https://wicked-moonlight-95928.herokuapp.com/callback';
@@ -27,7 +28,18 @@ generateRandomString = (length) => {
  		text+=possible.charAt(Math.floor(Math.random() * possible.length));
  	}
  	return text;
- }
+}
+
+arrayContainsKeyValue = (key, value, myArray) => {
+  for (let i=0;i < myArray.length; i++) {
+    if (myArray[i][key] == value) {
+      console.log('Found duplicate');
+      return true;
+    }
+  }
+  return false;
+}
+
 
 var stateKey = 'spotify_auth_state';
 
@@ -42,7 +54,7 @@ app.get('/login', (req, res, next) => {
 	var state = generateRandomString(16);
 	res.cookie(stateKey, state);
 
-	var scope = 'user-read-private user-read-email user-read-currently-playing user-read-playback-state';
+	var scope = 'user-read-private user-read-email user-read-currently-playing user-read-playback-state user-modify-playback-state';
 
 	res.redirect('https://accounts.spotify.com/authorize?' + 
 		querystring.stringify({
@@ -77,7 +89,7 @@ app.get('/callback', (req, res, next) => {
 				grant_type: 'authorization_code'
 			},
 			headers: {
-				'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+				'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64'))
 			},
 			json: true
 		};
@@ -120,7 +132,7 @@ app.get('/refresh_token', (req, res, next) => {
 	var refresh_token = req.query.refresh_token;
 	var authOptions = {
 		url: 'https://accounts.spotify.com/api/token',
-		headers: {'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+		headers: {'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64')) },
 		form: {
 			grant_type: 'refresh_token',
 			refresh_token: refresh_token
@@ -143,32 +155,65 @@ app.get('/refresh_token', (req, res, next) => {
 });
 
 app.post('/rec-analysis', (req, res, next) => {
-	var error = false;
-	console.log(req.body);
-	req.on('data', (data) => {
-		// song_analysis = JSON.parse(data.analysis);
-		// console.log('Data: '+data.analysis);
-		try {
-			analysis = data;
-		} catch(e) {
-			console.log(e);
-			error = true;
-		}
-	});
-
+	
+	let error = false;
+	var track_info = req.body.track;
+	
+	error = track_info === undefined ? true : false;
+	
 	if (!error){
 		res.send({
+			'status': 'Accepted',
 			'code': 10001,
-			'message': 'Data received'
+			'message': 'Analysis received'
 		});
-	}
-	else {
+	} else {
+		console.log(req.body);
 		res.send({
-			'message': e
+			'status': 'Rejected',
+			'code': 10002,
+			'message': 'Invalid format'
 		});
 	}
 });
 
+app.post('/rec-features', (req, res, next) => {
+	let error = {'value': false, 'reason': ''};
+	let features = req.body;
+
+  if (features.id === undefined) {
+    error.value = true;
+    error.reason = 'Invalid format';
+  }	
+  
+  let check = arrayContainsKeyValue('id', features.id, song_features);
+
+  console.log(check);
+
+  //check if already stored
+  if (check) {
+    error.value = true;
+    error.reason = 'Data already stored';
+  }
+  
+  console.log(error);
+  
+	if (!error.value) {
+    song_features.push(features);
+    console.log(song_features);
+		res.send({
+			'status': 'Accepted',
+			'code': 10003,
+			'message': 'Features received'
+		});
+	} else {
+		res.send({
+      'status': 'Rejected',
+      'code': 10004,
+      'message': error.reason
+    });
+	}
+});
 
 app.listen(PORT, () => {
 	console.log(`Server is listening on port ${PORT}`);

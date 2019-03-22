@@ -13,6 +13,7 @@
   "description": "A play around with the spotify API expanding from the Athorization Code example at https://github.com/spotify/web-api-auth-examples",
   "homepage": "https://bitbucket.org/pdjones/visualisation#readme",
   "dependencies": {
+    "amqplib": "^0.5.3",
     "c3": "^0.4.21",
     "cookie-parser": "^1.4.3",
     "d3": "^3.5.17",

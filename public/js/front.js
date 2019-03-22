@@ -45,8 +45,8 @@ function getCurrentlyPlaying() {
       market: 'GB'
     },
     success: function(response, textStatus, xhr) {
-      
-      if (response.item !== null && xhr.status !== 202) {
+      error_count = 0;
+      if (xhr.status === 200) {
         playing = response.is_playing;
         duration = response.item.duration_ms;
         progress = response.progress_ms;
@@ -66,29 +66,45 @@ function getCurrentlyPlaying() {
           track_id = response.item.id;
           updateProgressBar(duration, track_id);
         }
+      } else if (xhr.status === 204) {
+        console.error('Unexpected response from Spotify API:',xhr.status);
+        clearInterval(timer);
       } else {
         clearInterval(timer);
-        console.error('Unexpected response from Spotify API: ', xhr.status);
+        console.error('Unexpected response from Spotify API:', xhr.status);
         $('#obtain-new-token').click();
         timeout = true;
         playing = false;
       }
     },
     error: function(response, textStatus, xhr) {
-      
-      if (response.status === 401) {
-        $('#obtain-new-token').css('background-color', 'red');
-        clearInterval(timer);
-        console.log('Access token expired');
-        timeout = true;
-        playing = false;
-      }
-      else {
-        clearInterval(timer);
-        console.error('Error communicating with Spotify API')
-        timeout = true;
-        playing = false;
-      }
+      switch(response.status) {
+        case 401:
+          $('#obtain-new-token').css('background-color', 'red');
+          clearInterval(timer);
+          console.error('Access token expired');
+          timeout = true;
+          playing = false;
+          break;
+
+        case 502:
+          error_count++;
+          if (error_count > 5) {
+            clearInterval(timer);
+            console.error('Error communicating with Spotify API');
+            timeout = true;
+            playing = false;
+          } else {
+            console.error('Error communicating with Spotify API. Count:',error_count);
+          }
+          break;
+
+        default:
+          clearInterval(timer);
+          console.error('Error communicating with Spotify API')
+          timeout = true;
+          playing = false;
+      }      
     }
   });
 }
@@ -190,8 +206,8 @@ function postTrackAnalysis(response, id) {
     //   analysis: JSON.stringify(response),
     //   id: encodeURIComponent(id)
     // },
-    // processData: false,
     data: JSON.stringify(response),
+    // data: JSON.stringify({some: "notjson"}),
     contentType: 'application/json',
     success: function(response) {
       console.log(response);
@@ -201,6 +217,25 @@ function postTrackAnalysis(response, id) {
     }
   });
 }
+
+
+function postTrackFeatures(response, id) {
+  console.log(response);
+  $.ajax({
+    method: 'POST',
+    url: '/rec-features',
+    dataType: 'json',
+    data: JSON.stringify(response),
+    contentType: 'application/json',
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(response) {
+      console.error('Error sending feature data to server');
+    }
+  });
+}
+
 
 function getAudioFeatures(id) {
   $.ajax({
@@ -216,6 +251,7 @@ function getAudioFeatures(id) {
       // chart.unload();
       updateChart();
       // displayChart();
+      postTrackFeatures(response, id);
     },
     error: function(response) {
       console.error('Error in fetching audio features');
@@ -251,6 +287,13 @@ function seekToPoint(e) {
 
 }
 
+function nextTrack() {
+
+}
+
+function previousTrack() {
+
+}
 
 var userProfileSource = document.getElementById('user-profile-template').innerHTML,
     userProfileTemplate = Handlebars.compile(userProfileSource),
@@ -279,6 +322,7 @@ var chart;
 var feature_categories = ['danceability', 'energy', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence'];
 var feature_placeholder = ['0','0','0','0','0','0','0'];
 var first_track = true;
+var error_count = 0;
 
 chart = c3.generate({
     bindto: '#chart',
@@ -334,6 +378,7 @@ if (error) {
       },
       error: function(statusText, response, xhr) {
         console.error('Error Authenticating using token in url: '+ access_token);
+        window.location.href = '/';
       }
     });
 
