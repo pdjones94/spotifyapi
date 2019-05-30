@@ -174,6 +174,27 @@ function pauseBeatTimer() {
   $('#beat-circle').css('animation', 'pulse '+ beat_interval +'ms infinite');
 }
 
+function getNewAccessToken() {
+  $.ajax({
+    url: '/refresh_token',
+    data: {
+      'refresh_token': refresh_token
+    }
+  }).done(function(data) {
+    access_token = data.access_token;
+    window.location.hash = '#access_token='+access_token;
+    oauthPlaceholder.innerHTML = oauthTemplate({
+      access_token: access_token,
+      refresh_token: refresh_token
+    });
+    timeout ? (
+      $('#obtain-new-token').css('background-color', '#fff'),
+      initPlayerListener(),
+      timeout = false
+    ) : console.log('Obtained new token');
+  });
+}
+
 /**
 * AJAX request for detailed analysis for track
 * @params {string} id
@@ -283,17 +304,37 @@ function updateChart() {
   }  
 }
 
+function status(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return Promise.resolve(response);
+  } else {
+    return Promise.reject(new Error(response.statusText));
+  }
+}
+
+function json() {
+  return response.json();
+}
+
 function seekToPoint(e) {
 
 }
 
-function nextTrack() {
-
+function handleTrack(command) {
+  fetch(`https://api.spotify.com/v1/me/player/${command}`, {
+    method: (command === 'pause' || command === 'play') ? 'put' : 'post',
+    headers: {
+      'Authorization': 'Bearer ' + access_token
+    }
+  })
+  .then(status)
+  .then(function () {
+    console.log(`${command} track`)
+  }).catch(function (error) {
+    console.error(`Request failed: ${error}`)
+  });
 }
 
-function previousTrack() {
-
-}
 
 var userProfileSource = document.getElementById('user-profile-template').innerHTML,
     userProfileTemplate = Handlebars.compile(userProfileSource),
@@ -323,6 +364,13 @@ var feature_categories = ['danceability', 'energy', 'speechiness', 'acousticness
 var feature_placeholder = ['0','0','0','0','0','0','0'];
 var first_track = true;
 var error_count = 0;
+
+const CONTROLS = {
+  PLAY: 'play',
+  PAUSE: 'pause',
+  NEXT: 'next',
+  PREVIOUS: 'previous'
+}
 
 chart = c3.generate({
     bindto: '#chart',
@@ -387,24 +435,28 @@ if (error) {
     $('#loggedin').hide();
   }
 
-  document.getElementById('obtain-new-token').addEventListener('click', function() {
-    $.ajax({
-      url: '/refresh_token',
-      data: {
-        'refresh_token': refresh_token
+
+  $(document).ready(
+    document.addEventListener('click', function(event) {
+
+      switch (event.target.id) {
+        case 'previous-track':
+          handleTrack(CONTROLS.PREVIOUS);
+          break;
+
+        case 'next-track':
+          handleTrack(CONTROLS.NEXT);
+          break;
+
+        case 'play-pause':
+          playing ? handleTrack(CONTROLS.PAUSE) : handleTrack(CONTROLS.PLAY);
+          break;
+
+        case 'obtain-new-token':
+          getNewAccessToken();
+          break;
       }
-    }).done(function(data) {
-      access_token = data.access_token;
-      window.location.hash = '#access_token='+access_token;
-      oauthPlaceholder.innerHTML = oauthTemplate({
-        access_token: access_token,
-        refresh_token: refresh_token
-      });
-      timeout ? (
-        $('#obtain-new-token').css('background-color', '#fff'),
-        initPlayerListener(),
-        timeout = false
-      ) : console.log('Obtained new token');
-    });
-  }, false);
+
+    }, false)
+  );
 }

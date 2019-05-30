@@ -35,6 +35,13 @@ body {
 	background-color: #1db954;
 }
 
+#controls {
+  text-align: center;
+  margin: 0 auto;
+  display: block;
+  padding: 2% 0 2% 43%;
+}
+
 @-webkit-keyframes pulse {
     0% {
       -webkit-box-shadow: 0 0 0 0 rgba(204, 169, 44, 0.4);

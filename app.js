@@ -168,7 +168,9 @@ app.post('/rec-analysis', (req, res, next) => {
 			'message': 'Analysis received'
 		});
 	} else {
-		console.log(req.body);
+		
+		console.error(req.body);
+
 		res.send({
 			'status': 'Rejected',
 			'code': 10002,
@@ -186,12 +188,12 @@ app.post('/rec-features', (req, res, next) => {
     error.reason = 'Invalid format';
   }	
   
-  let check = arrayContainsKeyValue('id', features.id, song_features);
+  let alreadyStored = arrayContainsKeyValue('id', features.id, song_features);
 
-  console.log(check);
+  console.log(alreadyStored);
 
   //check if already stored
-  if (check) {
+  if (alreadyStored) {
     error.value = true;
     error.reason = 'Data already stored';
   }
@@ -199,8 +201,10 @@ app.post('/rec-features', (req, res, next) => {
   console.log(error);
   
 	if (!error.value) {
-    song_features.push(features);
-    console.log(song_features);
+		song_features.push(features);
+		
+		console.info(song_features);
+		
 		res.send({
 			'status': 'Accepted',
 			'code': 10003,
@@ -216,5 +220,5 @@ app.post('/rec-features', (req, res, next) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`Server is listening on port ${PORT}`);
+	console.info(`Server is listening on port ${PORT}`);
 });
