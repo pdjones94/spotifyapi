@@ -13,17 +13,16 @@
   "description": "A play around with the spotify API expanding from the Athorization Code example at https://github.com/spotify/web-api-auth-examples",
   "homepage": "https://bitbucket.org/pdjones/visualisation#readme",
   "dependencies": {
-    "amqplib": "^0.5.3",
-    "c3": "^0.4.23",
-    "cookie-parser": "^1.4.4",
-    "d3": "^3.5.17",
-    "express": "^4.16.4",
-    "gulp": "^4.0.0",
+    "amqplib": "^0.8.0",
+    "c3": "^0.7.20",
+    "cookie-parser": "^1.4.5",
+    "d3": "^7.0.0",
+    "express": "^4.17.1",
+    "gulp": "^4.0.2",
     "lodash": "^4.17.21",
-    "merge-stream": "^1.0.1",
+    "merge-stream": "^2.0.0",
     "minimatch": "^3.0.4",
-    "request": "^2.88.0"
+    "request": "^2.88.2"
   },
-  "devDependencies": {},
   "license": "ISC"
 }
